@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# Diretório de saída da compilação (gerado por run.sh)
+/out/
+
 # Log file
 *.log
 
