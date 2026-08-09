@@ -1,106 +1,81 @@
-# Roteiro de Laboratório — Threads em Java
+# Roteiro de Threads em Java
 
-**PUC Minas · Engenharia de Software · LabDAMD · Unidade 0 — Revisão de SO e Concorrência**
+Roteiro 1 de laboratório (Threads em Java) - PUC Minas, Engenharia de Software.
 
-Implementação das cinco partes (A–E) do roteiro "Threads em Java", usando **Java 21+**.
-O domínio é propositalmente simples — um **guichê de atendimento** — para manter o foco
-no *mecanismo de concorrência*, não na lógica de negócio.
+São as 5 partes do roteiro (A a E) feitas em Java 21. O "problema" é bem simples de
+propósito, um guichê de atendimento, porque o foco é a parte de concorrência e não a lógica.
 
-O relatório com as respostas às perguntas de cada parte, os exercícios de fixação e a
-análise crítica dos resultados medidos está em **[`RELATORIO.md`](RELATORIO.md)**.
+As respostas das perguntas de cada parte e os exercícios estão no [`RELATORIO.md`](RELATORIO.md).
 
-## Objetivos
+## O que precisa pra rodar
 
-Ao final do laboratório, deve-se ser capaz de:
+- JDK 21 ou mais novo (a Parte E usa Virtual Threads, que só tem do Java 21 pra frente).
+  Confere com `java -version`.
+- Um terminal com bash pra usar o `run.sh` (ou dá pra chamar `javac`/`java` na mão).
 
-1. Explicar a diferença entre **processo** e **thread** do ponto de vista do SO.
-2. Implementar threads em Java com **`Thread`** e **`Runnable`**.
-3. Implementar a mesma solução com **`ExecutorService`** e **Virtual Threads (Java 21+)**.
-4. Observar na prática o **custo real** de criar milhares de threads de SO.
+Não usei Maven nem Gradle nem nenhuma biblioteca externa, só o JDK.
 
-## Pré-requisitos
-
-- **JDK 21 ou superior** (a Parte E usa *Virtual Threads*, disponíveis a partir do Java 21).
-  Confira com `java -version`.
-- Um shell compatível com Bash para o script `run.sh` (opcional — dá para usar `javac`/`java` direto).
-
-Não há dependências externas nem build tool: apenas o JDK.
-
-## Estrutura do projeto
+## Organização
 
 ```
 src/br/pucminas/labdamd/threads/
-├── comum/
-│   ├── Cronometro.java          # medição de tempo (nanoTime)
-│   └── Guiche.java              # domínio compartilhado: "atender" um cliente (~1s)
-├── partea/                      # Parte A — extends Thread
-│   ├── AtendimentoThread.java
-│   └── MainParteA.java
-├── parteb/                      # Parte B — implements Runnable
-│   ├── AtendimentoRunnable.java
-│   └── MainParteB.java
-├── partec/                      # Parte C — muitas threads de SO (limite do modelo clássico)
-│   └── MainParteC.java
-├── parted/                      # Parte D — ExecutorService (pool de threads)
-│   └── MainParteD.java
-└── partee/                      # Parte E — Virtual Threads (Java 21+)
-    └── MainParteE.java
+├── comum/          -> Cronometro (mede o tempo) e Guiche (o "atender" que dorme 1s)
+├── partea/         -> Parte A: extends Thread
+├── parteb/         -> Parte B: implements Runnable
+├── partec/         -> Parte C: muitas threads de SO (o limite)
+├── parted/         -> Parte D: ExecutorService (pool)
+└── partee/         -> Parte E: Virtual Threads
 ```
 
-## Como compilar e executar
+## Como rodar
 
-O script `run.sh` compila tudo em `./out` e executa cada parte:
+Com o `run.sh` (ele compila em `./out` e executa):
 
 ```bash
-./run.sh compile          # compila todas as fontes em ./out
-./run.sh a                # Parte A (extends Thread)      — 5 clientes
-./run.sh b                # Parte B (implements Runnable)  — 5 clientes
-./run.sh c                # Parte C — 10.000 threads de SO
-./run.sh c 20000          # Parte C com N threads (aumente para provocar o limite)
-./run.sh d                # Parte D — pool fixo de 4, 10 clientes
-./run.sh d --cached       # Parte D — newCachedThreadPool() (exercício de fixação)
-./run.sh e                # Parte E — 100.000 virtual threads
-./run.sh all              # A, B e D em sequência (C e E são pesadas; rode à parte)
-./run.sh clean            # remove ./out
+./run.sh compile      # compila tudo
+./run.sh a            # Parte A (5 clientes)
+./run.sh b            # Parte B (5 clientes)
+./run.sh c            # Parte C (10.000 threads)
+./run.sh c 20000      # Parte C com outra quantidade
+./run.sh d            # Parte D (pool fixo de 4, 10 clientes)
+./run.sh d --cached   # Parte D usando newCachedThreadPool() (exercício 1)
+./run.sh e            # Parte E (100.000 virtual threads)
+./run.sh all          # roda A, B e D em seguida
+./run.sh clean        # apaga o ./out
 ```
 
-### Sem o `run.sh` (apenas `javac`/`java`)
+Se quiser rodar sem o script:
 
 ```bash
-# compilar
 mkdir -p out && find src -name '*.java' | xargs javac -d out
-
-# executar (ex.: Parte A)
 java -Dstdout.encoding=UTF-8 -cp out br.pucminas.labdamd.threads.partea.MainParteA
 ```
 
-> **Acentuação:** as classes `Main` passam `-Dstdout.encoding=UTF-8` via `run.sh`.
-> Ao rodar `java` direto, inclua esse parâmetro se o console cortar os acentos.
+(o `-Dstdout.encoding=UTF-8` é só pra não cortar os acentos quando a saída é redirecionada)
 
-### Observando as threads no SO (Parte C)
+## Vendo as threads no SO (Parte C)
 
-Enquanto a Parte C está rodando, em **outro terminal**:
+Enquanto a Parte C tá rodando, em outro terminal dá pra ver quantas threads o processo criou
+(o PID ele imprime na tela):
 
 ```bash
-ps -o nlwp= -p <PID>          # Linux: nº de threads (LWPs) do processo
-cat /proc/<PID>/status | grep Threads   # Linux: idem, via /proc
-# Windows: Gerenciador de Tarefas → Detalhes → coluna "Threads"
+ps -o nlwp= -p <PID>              # Linux
+cat /proc/<PID>/status | grep Threads
+# no Windows: Gerenciador de Tarefas > Detalhes > coluna Threads
 ```
 
-O `<PID>` é impresso pela própria Parte C ao iniciar.
+## Tempos que deram na minha máquina
 
-## Resultados medidos (resumo)
+Rodei tudo no OpenJDK 21 no Linux. Em outra máquina os números mudam, mas a comparação é a
+mesma:
 
-Medições feitas neste ambiente (OpenJDK 21, Linux). Números variam conforme a máquina —
-o que importa é a **ordem de grandeza** e a comparação entre as abordagens.
+| Parte | Abordagem | Carga | Tempo |
+|-------|-----------|-------|-------|
+| A | extends Thread | 5 clientes | ~1,0 s |
+| B | implements Runnable | 5 clientes | ~1,0 s |
+| C | threads de SO | 10.000 | ~5,3 s |
+| D | pool fixo de 4 | 10 clientes | ~3,0 s |
+| D | cached | 10 clientes | ~1,0 s |
+| E | virtual threads | 100.000 | ~2,4 s |
 
-| Parte | Abordagem | Carga | Tempo total | Observação |
-|-------|-----------|-------|-------------|------------|
-| A | `extends Thread` | 5 clientes | ~1,0 s | atendimentos em paralelo |
-| B | `implements Runnable` | 5 clientes | ~1,0 s | idem, sem prender a herança |
-| C | threads de plataforma | 10.000 | ~5,3 s | custo de criação visível; OOM sob limite de recursos |
-| D | `newFixedThreadPool(4)` | 10 clientes | ~3,0 s | 3 ondas de 4/4/2 threads |
-| D | `newCachedThreadPool()` | 10 clientes | ~1,0 s | ~10 threads criadas sob demanda |
-| E | Virtual Threads | 100.000 | ~2,4 s | 10× a carga da Parte C, sem OOM |
-
-Análise completa e respostas às perguntas: **[`RELATORIO.md`](RELATORIO.md)**.
+O comentário sobre cada um tá no [`RELATORIO.md`](RELATORIO.md).

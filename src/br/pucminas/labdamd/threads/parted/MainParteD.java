@@ -7,24 +7,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Parte D — forma atual #1: em vez de criar uma thread de SO por tarefa, um
- * <strong>pool</strong> reaproveita um número fixo de threads reais.
- *
- * <p>Você <em>submete</em> tarefas ({@code pool.submit(...)}) — quem decide como
- * e quando executá-las é o próprio pool. Com {@code newFixedThreadPool(4)},
- * 10 clientes são atendidos por apenas 4 threads reutilizadas: repare que os
- * nomes {@code pool-1-thread-1..4} se repetem entre as tarefas.</p>
- *
- * <p><strong>Exercício de fixação:</strong> passe o argumento {@code --cached}
- * para trocar o pool fixo por {@link Executors#newCachedThreadPool()} e observar
- * a diferença de comportamento (o cached cria threads sob demanda e as reaproveita
- * por até 60s ociosos — com 10 tarefas curtas ele tende a criar ~10 threads e
- * concluir em ~1s, em vez dos ~3s do pool fixo de 4).</p>
- *
- * <p>Uso: {@code java ...parted.MainParteD [--cached] [qtdClientes]}
- * (padrão: pool fixo de 4, 10 clientes).</p>
- */
+// Parte D - em vez de criar uma thread por tarefa, uso um pool com um numero
+// fixo de threads e vou submetendo as tarefas. O pool reaproveita as threads
+// (repare que os nomes pool-1-thread-1..4 se repetem).
+//
+// Exercicio do final: passar --cached troca o pool fixo por um cached, que cria
+// thread por demanda (com 10 tarefas curtas ele cria ~10 e termina em ~1s, em
+// vez dos ~3s do fixo de 4).
+//
+// Uso: java ...MainParteD [--cached] [qtdClientes]  (padrao: fixo de 4, 10 clientes)
 public final class MainParteD {
 
     private static final int TAMANHO_POOL = 4;
@@ -41,8 +32,8 @@ public final class MainParteD {
             }
         }
 
-        System.out.println("=== Parte D — ExecutorService (pool de threads) ===");
-        System.out.printf("Estratégia: %s | clientes: %d%n%n",
+        System.out.println("=== Parte D - ExecutorService (pool de threads) ===");
+        System.out.printf("Pool: %s | clientes: %d%n%n",
             usarCached ? "newCachedThreadPool()" : "newFixedThreadPool(" + TAMANHO_POOL + ")", qtd);
 
         Cronometro cronometro = Cronometro.iniciar();
@@ -52,7 +43,7 @@ public final class MainParteD {
             : Executors.newFixedThreadPool(TAMANHO_POOL);
 
         for (int i = 0; i < qtd; i++) {
-            int idCliente = i + 1; // efetivamente final para uso no lambda
+            int idCliente = i + 1; // precisa ser final pra usar no lambda
             pool.submit(() -> {
                 System.out.printf("%s atendendo cliente %d%n",
                     Thread.currentThread().getName(), idCliente);
@@ -60,20 +51,18 @@ public final class MainParteD {
             });
         }
 
-        // shutdown(): impede novas submissões e deixa terminar as já aceitas.
-        // Sem ele, o pool continuaria vivo esperando tarefas e o programa nunca
-        // terminaria (as threads do pool não são daemon).
+        // shutdown(): nao aceita mais tarefa e deixa terminar as que ja entraram.
+        // Sem isso o programa nao fecha (as threads do pool ficam esperando tarefa).
         pool.shutdown();
         boolean terminou = pool.awaitTermination(1, TimeUnit.MINUTES);
         if (!terminou) {
-            System.err.println("Atenção: o pool não terminou dentro do tempo limite.");
+            System.err.println("Atencao: o pool nao terminou no tempo limite.");
         }
 
         System.out.printf("%nTempo total: %s%n", cronometro.decorridoFormatado());
         if (!usarCached) {
             int ondas = (int) Math.ceil((double) qtd / TAMANHO_POOL);
-            System.out.printf(
-                "Observação: %d clientes / %d threads = %d ondas de ~1s => ~%ds.%n",
+            System.out.printf("%d clientes / %d threads = %d ondas de ~1s => ~%ds.%n",
                 qtd, TAMANHO_POOL, ondas, ondas);
         }
     }

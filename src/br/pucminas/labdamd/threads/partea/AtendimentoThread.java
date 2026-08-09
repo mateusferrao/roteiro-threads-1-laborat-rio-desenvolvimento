@@ -2,35 +2,24 @@ package br.pucminas.labdamd.threads.partea;
 
 import br.pucminas.labdamd.threads.comum.Guiche;
 
-/**
- * Parte A — forma clássica #1: a própria classe <strong>herda de
- * {@link Thread}</strong> e sobrescreve {@link #run()}.
- *
- * <p><strong>Limitação central (herança única):</strong> em Java uma classe só
- * pode estender <em>uma</em> superclasse. Como {@code AtendimentoThread} já
- * gastou seu "slot" de herança em {@code Thread}, ela nunca poderá herdar de
- * outra classe (por exemplo, um hipotético {@code Funcionario}). É exatamente
- * essa amarração que a Parte B resolve usando {@link Runnable}.</p>
- */
+// Parte A - forma antiga: a classe herda de Thread e sobrescreve o run().
+// Problema dessa forma: como ela ja herda de Thread, nao pode herdar de mais
+// nenhuma classe (ex: um Funcionario). E isso que a Parte B resolve.
 public class AtendimentoThread extends Thread {
 
     private final int idCliente;
 
     public AtendimentoThread(int idCliente) {
         this.idCliente = idCliente;
-        // setName() ajuda a identificar cada thread nos logs — essencial para
-        // depurar concorrência, onde a ordem de execução não é determinística.
+        // dou nome pra thread pra conseguir identificar quem e quem no log
         setName("Atendente-" + idCliente);
     }
 
-    /**
-     * Código que será executado <em>na nova thread</em> quando (e somente
-     * quando) {@link #start()} for chamado.
-     */
+    // esse codigo roda na thread nova quando eu chamo start()
     @Override
     public void run() {
         System.out.printf("%s atendendo cliente %d%n", getName(), idCliente);
-        Guiche.atender(idCliente); // bloqueia ~1s simulando o atendimento
+        Guiche.atender(idCliente); // fica ~1s "atendendo"
         System.out.printf("%s finalizou o cliente %d%n", getName(), idCliente);
     }
 }
