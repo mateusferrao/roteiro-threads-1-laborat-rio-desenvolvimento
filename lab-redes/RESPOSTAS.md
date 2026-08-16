@@ -97,7 +97,47 @@ mas todo esse trabalho de controle vira responsabilidade minha.
 
 ## Parte C — Multicast
 
-_(a preencher)_
+> Testei com 2 clientes recebendo os mesmos avisos ao mesmo tempo (`evidencias/multicast/`).
+> Em Python funcionou direto. Em Java, como o container mapeia o hostname pra 127.0.0.1, precisei
+> forçar o emissor pela interface de loopback (o mesmo caso do comentário no `ClienteMulticast.java`
+> para testar na mesma máquina) — o código entregue está fiel ao enunciado.
+
+**1. Qual a diferença entre mandar a mesma mensagem para 3 clientes por unicast repetido 3× e
+mandar uma vez por multicast? (pense em tráfego de rede)**
+
+No **unicast repetido**, o emissor faz uma cópia da mensagem pra cada destinatário: pra 3 clientes,
+saem **3 pacotes iguais** dele. Se fossem 100 clientes, seriam 100 cópias saindo da mesma origem —
+o tráfego cresce junto com o número de destinatários, e o link do emissor vira gargalo.
+
+No **multicast**, o emissor manda **um pacote só**, endereçado ao grupo. Quem se encarrega de
+duplicar são os equipamentos de rede (switches/roteadores), e só nos pontos onde a árvore de
+distribuição se ramifica, perto dos destinatários. Então a mesma origem gasta muito menos banda: o
+tráfego passa a depender da topologia (a árvore), não de N cópias saindo da fonte. Foi o que dá pra
+ver no teste: o servidor imprimiu "Enviado" 5 vezes (uma por aviso), e os **dois** clientes
+receberam os 5, sem o servidor mandar 10 pacotes.
+
+**2. O que é o TTL configurado no socket multicast e por que ele importa pro alcance?**
+
+TTL (time-to-live) é um número no cabeçalho IP que **cai de 1 a cada roteador** por onde o pacote
+passa; quando chega a 0, o pacote é descartado. No multicast ele serve pra **limitar o alcance**:
+com TTL baixo o aviso não vaza pra fora da rede local, com TTL maior ele atravessa mais redes. No
+código Python eu deixei `IP_MULTICAST_TTL = 2`, ou seja, os avisos cruzam no máximo 2 saltos. Isso
+importa porque multicast sem limite poderia se espalhar longe demais e poluir outras redes — o TTL
+é o "raio de alcance" que a gente controla.
+
+**3. Se um cliente ficar offline e voltar, ele recebe os avisos que perdeu? Por quê? Relacione com
+a comunicação em grupo.**
+
+Não recebe. Multicast roda sobre UDP, que é "manda e esquece": não tem retransmissão nem
+armazenamento de mensagens passadas. O servidor dispara o aviso pro grupo **naquele instante**, e só
+quem está inscrito **naquele momento** recebe. Quem estava offline simplesmente perdeu aqueles
+datagramas — ninguém guardou uma cópia pra reenviar depois.
+
+Isso combina com a arquitetura de grupo: o emissor **nem sabe quem são os membros** (é justamente a
+graça do multicast, não precisar conhecer cada destinatário). Sem saber quem está no grupo, ele não
+teria nem como reenviar pra alguém específico que voltou. Se eu quisesse esse comportamento
+("recuperar o que perdi"), precisaria de uma camada a mais — multicast confiável, ou um servidor que
+guarde o histórico dos avisos e reenvie quando o cliente reconecta.
 
 ---
 

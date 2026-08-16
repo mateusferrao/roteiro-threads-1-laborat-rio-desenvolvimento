@@ -1,0 +1,33 @@
+Evidência de execução — Multicast (Java)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saída capturada em execução real (container Linux).
+
+NOTA: neste container o hostname resolve para 127.0.0.1, então foi preciso
+forçar o EMISSOR a sair pela interface de loopback (o mesmo caso que o
+comentário do ClienteMulticast.java cobre para teste na MESMA máquina). O
+código entregue (ServidorMulticast/ClienteMulticast) é fiel ao enunciado; os
+CLIENTES abaixo são os arquivos entregues, sem alteração, recebendo os avisos.
+Para a ENTREGA, tire o print (.png) na sua máquina com os 3 terminais e o Get-Date.
+
+============ TERMINAL 1 — SERVIDOR (emissor) ============
+[Multicast] Enviado: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Enviado: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Enviado: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Enviado: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Enviado: Aviso #5: a aula começa em 0 minuto(s)!
+
+============ TERMINAL 2 — CLIENTE 1 (entregue) ============
+[Multicast] Inscrito no grupo 230.0.0.1:4485. Aguardando avisos...
+[Multicast] Recebido: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Recebido: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Recebido: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Recebido: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Recebido: Aviso #5: a aula começa em 0 minuto(s)!
+
+============ TERMINAL 3 — CLIENTE 2 (entregue) ============
+[Multicast] Inscrito no grupo 230.0.0.1:4485. Aguardando avisos...
+[Multicast] Recebido: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Recebido: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Recebido: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Recebido: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Recebido: Aviso #5: a aula começa em 0 minuto(s)!

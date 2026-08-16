@@ -1,0 +1,28 @@
+Evidência de execução — Multicast (Python)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saída capturada em execução real (container Linux). Funcionou direto (INADDR_ANY).
+Para a ENTREGA, tire o print (.png) com os 3 terminais e o Get-Date visível.
+
+============ TERMINAL 1 — SERVIDOR ============
+[Multicast] Enviando avisos para o grupo 230.0.0.1:4485
+[Multicast] Enviado: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Enviado: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Enviado: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Enviado: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Enviado: Aviso #5: a aula começa em 0 minuto(s)!
+
+============ TERMINAL 2 — CLIENTE 1 ============
+[Multicast] Inscrito no grupo 230.0.0.1:4485. Aguardando avisos...
+[Multicast] Recebido: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Recebido: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Recebido: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Recebido: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Recebido: Aviso #5: a aula começa em 0 minuto(s)!
+
+============ TERMINAL 3 — CLIENTE 2 ============
+[Multicast] Inscrito no grupo 230.0.0.1:4485. Aguardando avisos...
+[Multicast] Recebido: Aviso #1: a aula começa em 4 minuto(s)!
+[Multicast] Recebido: Aviso #2: a aula começa em 3 minuto(s)!
+[Multicast] Recebido: Aviso #3: a aula começa em 2 minuto(s)!
+[Multicast] Recebido: Aviso #4: a aula começa em 1 minuto(s)!
+[Multicast] Recebido: Aviso #5: a aula começa em 0 minuto(s)!
