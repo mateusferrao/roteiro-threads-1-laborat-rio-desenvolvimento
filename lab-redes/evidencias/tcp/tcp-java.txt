@@ -1,0 +1,26 @@
+Evidência de execução — TCP (Java)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saída capturada em execução real (container Linux).
+Obs.: para a ENTREGA, tire o print (.png) na sua máquina, com os dois
+terminais lado a lado e o 'Get-Date' visível (ver README/RESPOSTAS).
+
+================= TERMINAL 1 — SERVIDOR =================
+[TCP] Servidor aguardando conexões na porta 5039...
+[TCP] Cliente conectado: /127.0.0.1:57116
+[TCP] Recebido: Ola monitor
+[TCP] Recebido: qual a boa?
+[TCP] Recebido: hora
+[TCP] Recebido: sair
+[TCP] Servidor encerrado.
+
+================= TERMINAL 2 — CLIENTE =================
+[TCP] Conectado ao servidor. Digite 'sair' para encerrar.
+      (dica: mande 'hora' pra ver o horário do servidor)
+> Monitor responde: recebi sua mensagem -> "Ola monitor"
+> Monitor responde: recebi sua mensagem -> "qual a boa?"
+> Monitor responde: agora são 16/08/2026 14:47:38
+> Encerrando conexão. Até mais!
+
+----- Teste extra: iniciar o CLIENTE sem o servidor (pergunta 1) -----
+Exception in thread "main" java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
