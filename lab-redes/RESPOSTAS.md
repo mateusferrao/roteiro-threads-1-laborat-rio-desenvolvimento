@@ -143,4 +143,55 @@ guarde o histórico dos avisos e reenvie quando o cliente reconecta.
 
 ## Parte D — WebSocket
 
-_(a preencher)_
+> Testei os dois murais com servidor + 2 clientes: um cliente publicou "Pessoal, prova dia 20!"
+> e o aviso apareceu nos dois clientes (broadcast). As saídas estão em `evidencias/websocket/`.
+
+**1. O WebSocket começa com uma requisição HTTP com o cabeçalho `Upgrade: websocket`. O que muda na
+conexão depois que o handshake termina?**
+
+Antes do handshake é uma requisição HTTP normal: o cliente faz um GET com `Upgrade: websocket`
+pedindo pra "promover" aquela conexão. Quando o servidor aceita (responde `101 Switching
+Protocols`), a **mesma conexão TCP** deixa de falar HTTP e passa a falar o protocolo WebSocket.
+
+O que muda na prática: sai o modelo **requisição/resposta** do HTTP (cliente pergunta, servidor
+responde, repete) e entra um canal **full-duplex** — os dois lados podem mandar mensagem a qualquer
+momento, sem ficar reabrindo conexão. É por isso que o servidor consegue **empurrar** um aviso pro
+cliente sem ele ter pedido (foi o que aconteceu: o Cliente B recebeu o aviso do Cliente A sem ter
+mandado nada). A conexão fica aberta e as mensagens passam a ser "quadros" (frames) leves, sem o
+cabeçalho pesado do HTTP a cada troca.
+
+**2. Compare o mural (WebSocket, Parte D) com o aviso via Multicast (Parte C). Os dois entregam a
+vários destinatários — qual a diferença em como cada um descobre e alcança os destinatários?**
+
+No **multicast**, o emissor manda **um pacote pro grupo** e nem sabe quem está lá dentro — quem se
+encarrega de entregar é a rede (roteadores/switches duplicam o pacote). Não existe conexão nem
+lista de destinatários: quem estiver inscrito no grupo naquela hora recebe, quem não estiver, não.
+
+No **WebSocket**, o servidor mantém **uma conexão TCP separada e aberta com cada cliente**, e ele
+**conhece cada um** (no código, a lista `clientes_conectados` no Python e o `getConnections()` no
+Java). Pra "avisar todo mundo", o servidor percorre essa lista e manda a mensagem **individualmente
+por cada conexão** — ou seja, é o próprio servidor (na aplicação) que faz o "broadcast", não a rede.
+Resumindo: multicast é um-pra-grupo feito pela **rede**, sem o emissor conhecer ninguém; WebSocket é
+o **servidor** replicando pra cada conexão que ele mantém e controla.
+
+**3. Por que o WebSocket é mais adequado que TCP "cru" (Parte A) para o mural em tempo real, se os
+dois no fundo são conexões TCP?**
+
+Os dois são TCP por baixo, mas o WebSocket já vem com um monte de coisa pronta que eu teria que
+inventar no TCP cru:
+
+- **Enquadramento de mensagens (framing).** No TCP puro chega um "fluxo de bytes" sem fronteira; eu
+  tive que combinar um delimitador (o `\n` e o `readLine`) pra saber onde uma mensagem termina. O
+  WebSocket já entrega **mensagem por mensagem**, prontas.
+- **Padrão e interoperabilidade.** O handshake e o protocolo são padronizados, então um cliente
+  qualquer (inclusive o navegador, com a API `WebSocket` do JavaScript) conecta no meu mural sem eu
+  inventar formato. Com TCP cru, só quem conhece o meu "combinado" conecta.
+- **Bidirecional de verdade e feito pra web.** O mural precisa que o servidor **empurre** avisos a
+  qualquer momento pra vários clientes; o WebSocket foi desenhado pra isso e atravessa bem as
+  infraestruturas web (portas 80/443, proxies), enquanto um TCP cru numa porta própria costuma
+  esbarrar em firewall/proxy.
+
+Além disso, o TCP da Parte A do jeito que está atende **um cliente e encerra**; o mural precisa de
+**vários simultâneos**, que a lib de WebSocket já gerencia (a lista de conexões, o broadcast, os
+eventos de abrir/fechar). Dava pra fazer tudo isso no TCP cru, mas eu estaria basicamente
+reescrevendo o WebSocket na mão.

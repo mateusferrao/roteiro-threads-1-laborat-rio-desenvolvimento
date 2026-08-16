@@ -1,0 +1,31 @@
+Evidencia de execucao — WebSocket (Python)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saida capturada em execucao real (container Linux).
+Cenario: servidor + 2 clientes; o Cliente A publica um aviso e ele aparece
+no mural de TODOS (broadcast), inclusive no Cliente B que so estava ouvindo.
+Servidor e cliente com a lib websockets (porta 8927).
+Para a ENTREGA, tire o print (.png) com os 3 terminais e o Get-Date visivel.
+
+============ TERMINAL 1 — SERVIDOR ============
+[WebSocket] Servidor do mural iniciado na porta 8927.
+[WebSocket] Novo aluno conectado. Total: 1
+[WebSocket] Novo aluno conectado. Total: 2
+[WebSocket] Recebido: Pessoal, prova dia 20!
+[WebSocket] Aluno desconectado. Total: 1
+[WebSocket] Aluno desconectado. Total: 0
+
+============ TERMINAL 2 — CLIENTE A (publica) ============
+[WebSocket] Conectado ao mural. Digite 'sair' para encerrar.
+
+Bem-vindo(a) ao mural de avisos da turma!
+> > > 
+Aviso da turma: Pessoal, prova dia 20!
+> 
+
+============ TERMINAL 3 — CLIENTE B (ouve) ============
+[WebSocket] Conectado ao mural. Digite 'sair' para encerrar.
+
+Bem-vindo(a) ao mural de avisos da turma!
+> > 
+Aviso da turma: Pessoal, prova dia 20!
+> 

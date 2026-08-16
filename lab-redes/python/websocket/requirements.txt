@@ -1,0 +1,3 @@
+# Parte D - WebSocket em Python
+# Instale com:  pip install -r requirements.txt
+websockets>=12.0

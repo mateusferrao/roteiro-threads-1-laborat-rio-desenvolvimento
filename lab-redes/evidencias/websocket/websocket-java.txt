@@ -1,0 +1,31 @@
+Evidencia de execucao — WebSocket (Java)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saida capturada em execucao real (container Linux).
+Cenario: servidor + 2 clientes; o Cliente A publica um aviso e ele aparece
+no mural de TODOS (broadcast), inclusive no Cliente B que so estava ouvindo.
+Servidor: lib Java-WebSocket (Maven, porta 8926); Cliente: API nativa do JDK.
+Para a ENTREGA, tire o print (.png) com os 3 terminais e o Get-Date visivel.
+
+============ TERMINAL 1 — SERVIDOR ============
+[WebSocket] Servidor do mural iniciado.
+[WebSocket] Novo aluno conectado: /127.0.0.1:59986
+[WebSocket] Novo aluno conectado: /127.0.0.1:60002
+[WebSocket] Recebido: Pessoal, prova dia 20!
+[WebSocket] Aluno desconectado: /127.0.0.1:60002
+[WebSocket] Aluno desconectado: /127.0.0.1:59986
+
+============ TERMINAL 2 — CLIENTE A (publica) ============
+
+Bem-vindo(a) ao mural de avisos da turma!
+> [WebSocket] Conectado ao mural. Digite 'sair' para encerrar.
+> > 
+Aviso da turma: Pessoal, prova dia 20!
+> 
+
+============ TERMINAL 3 — CLIENTE B (ouve) ============
+
+Bem-vindo(a) ao mural de avisos da turma!
+> [WebSocket] Conectado ao mural. Digite 'sair' para encerrar.
+> 
+Aviso da turma: Pessoal, prova dia 20!
+> 
