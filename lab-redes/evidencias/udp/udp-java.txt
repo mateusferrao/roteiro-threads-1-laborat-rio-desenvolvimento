@@ -1,0 +1,23 @@
+Evidência de execução — UDP (Java)
+Lab de Redes — Central de Avisos da Turma (Roteiro 2)
+Saída capturada em execução real (container Linux).
+Obs.: para a ENTREGA, tire o print (.png) na sua máquina, com os terminais
+lado a lado e o 'Get-Date' visível.
+
+================= TERMINAL 1 — SERVIDOR =================
+[UDP] Servidor aguardando datagramas na porta 5040...
+[UDP] Recebido de /127.0.0.1: Ola por UDP
+[UDP] Recebido de /127.0.0.1: chegou?
+[UDP] Recebido de /127.0.0.1: sair
+
+================= TERMINAL 2 — CLIENTE =================
+[UDP] Pronto para enviar. Digite 'sair' para encerrar.
+> Monitor responde: recebi sua mensagem -> "Ola por UDP"
+> Monitor responde: recebi sua mensagem -> "chegou?"
+> 
+
+----- Passo 2: cliente com o SERVIDOR DESLIGADO (timeout 6s) -----
+Comportamento: o envio não dá erro, mas o cliente TRAVA esperando a
+resposta que nunca chega (foi encerrado pelo timeout do teste).
+[UDP] Pronto para enviar. Digite 'sair' para encerrar.
+> 
