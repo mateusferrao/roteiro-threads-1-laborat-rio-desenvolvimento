@@ -7,6 +7,9 @@ propósito, um guichê de atendimento, porque o foco é a parte de concorrência
 
 As respostas das perguntas de cada parte e os exercícios estão no [`RELATORIO.md`](RELATORIO.md).
 
+> **Roteiro 2 (Lab de Redes)** está na pasta [`lab-redes/`](lab-redes/) — TCP, UDP, Multicast e
+> WebSocket em Java e Python, com seu próprio README e RESPOSTAS.
+
 ## O que precisa pra rodar
 
 - JDK 21 ou mais novo (a Parte E usa Virtual Threads, que só tem do Java 21 pra frente).
