@@ -1,0 +1,15 @@
+# Java
+*.class
+target/
+out/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
