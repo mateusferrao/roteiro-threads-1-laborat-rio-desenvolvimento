@@ -89,7 +89,43 @@ _(respondida na Parte D, após implementar o RPC unário e o streaming)_
 
 ## Parte B — Protocol Buffers
 
-_(a preencher)_
+**1. Qual a vantagem de ter um contrato explícito e gerado automaticamente (`central.proto`) em vez
+de combinar o formato das mensagens só "de boca"?**
+
+No lab anterior, o formato das mensagens era um **combinado informal**: eu tinha que lembrar que a
+resposta do TCP vinha como `"Monitor responde: ..."` e tratar isso na mão, e se o cliente e o
+servidor discordassem (um espera um `\n`, o outro não manda) só descobria na hora que quebrava. Com
+o `.proto`, o formato é **uma fonte única da verdade**: os dois lados geram o código a partir do
+mesmo arquivo, então não dá pra um esperar `nome_aluno` e o outro mandar `aluno`. Além disso, a
+serialização (transformar objeto em bytes e vice-versa) é **gerada** — some a chance de bug de
+`getBytes`/`decode`, e a compatibilidade fica documentada pelos números dos campos (`= 1`, `= 2`).
+Resumindo: em vez de um acordo frágil na cabeça de quem programou, tenho um contrato versionado que
+a ferramenta garante que os dois lados respeitam.
+
+**2. O mesmo `central.proto` gerou código para Java e para Python. O que isso sugere sobre equipes
+que usam linguagens diferentes?**
+
+Sugere que a linguagem deixa de ser barreira pra comunicação. Como o contrato e o formato de fio
+(wire format) são os mesmos, um servidor escrito em Java e um cliente em Python (ou o contrário)
+conversam sem problema — foi o que testei, os dois lados falam o mesmo protocolo. Numa empresa real,
+isso quer dizer que times diferentes podem escolher a linguagem que preferem (Go, Java, Python,
+C++...) e ainda assim integrar seus serviços, desde que compartilhem o `.proto`. O contrato vira a
+"língua franca" entre os sistemas.
+
+**3. Onde ficam definidas `ConsultarHorario` e `AcompanharAvisos` no código gerado? Cite uma classe
+ou método que você reconheceu.**
+
+Dá pra achar as duas operações mesmo sem entender o resto do código gerado:
+
+- No **Python** (`central_pb2_grpc.py`): tem a classe `CentralAtendimentoStub` (o que o cliente
+  usa) e a `CentralAtendimentoServicer` (o que o servidor implementa), e dentro dela os métodos
+  `def ConsultarHorario(self, request, context)` e `def AcompanharAvisos(self, request, context)`.
+  Tem também a função `add_CentralAtendimentoServicer_to_server`, que é a que eu chamo no servidor.
+- No **Java** (`CentralAtendimentoGrpc.java`): reconheci a classe `CentralAtendimentoImplBase` (que
+  o meu servidor estende) e a `CentralAtendimentoBlockingStub`, onde aparece o método
+  `RespostaHorario consultarHorario(PerguntaHorario request)` e o
+  `Iterator<Aviso> acompanharAvisos(...)` — repare que o `acompanharAvisos` já devolve um
+  `Iterator`, justamente porque é o streaming (vários avisos).
 
 ---
 
