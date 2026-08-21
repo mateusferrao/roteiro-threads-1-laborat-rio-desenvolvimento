@@ -79,11 +79,26 @@ frameworks bons **deixam vazar de propósito** o que precisa: o gRPC ainda me ob
 `StatusRuntimeException`, deadlines etc. Um pouco de "não-transparência" de desempenho e de falha é
 saudável.
 
-**3. (Responder após concluir C e D) Comparando o cliente TCP do lab anterior com o cliente gRPC:
+**3. (Respondida após concluir C e D) Comparando o cliente TCP do lab anterior com o cliente gRPC:
 qual faz você "pensar em rede" e qual deixa você "pensar no problema"? A que transparência se
 relaciona?**
 
-_(respondida na Parte D, após implementar o RPC unário e o streaming)_
+Agora que implementei o unário e o streaming, dá pra comparar com clareza:
+
+- O **cliente TCP** me faz **pensar em rede**: eu tinha que criar o `Socket`, pegar os streams de
+  entrada/saída, mandar com `println`, ler com `readLine`, e ainda combinar o formato do texto
+  (onde a mensagem começa/termina, o que significa cada resposta). O meu código estava cheio de
+  detalhe de comunicação.
+- O **cliente gRPC** me deixa **pensar no problema**: eu escrevo `stub.consultarHorario(pergunta)`
+  e recebo uma `RespostaHorario`, ou faço um `for` sobre `stub.acompanharAvisos(...)` e vou
+  recebendo os avisos. Parece chamada de função e iteração normais — o socket, o HTTP/2, a
+  serialização e o parsing sumiram do meu código.
+
+Isso se relaciona principalmente com a **transparência de acesso** (acessar o recurso remoto com a
+mesma cara de um acesso local) e, junto, com a **transparência de localização** (o endereço e toda
+a "canalização" ficam escondidos no canal/stub, não espalhados pelo meu código). Foi exatamente o
+ganho que este roteiro quis mostrar: no lab anterior a transparência era pouca e eu pagava por ela
+"na mão"; com o gRPC, boa parte dela vem "de graça" a partir do contrato `.proto`.
 
 ---
 
@@ -174,4 +189,46 @@ organizada.
 
 ## Parte D — RPC com streaming
 
-_(a preencher)_
+> Rodei nas duas linguagens: depois da resposta do horário, o cliente recebe os 5 avisos, um a
+> cada 2 segundos, pela mesma conexão (`evidencias/streaming/`).
+
+**1. No lab anterior o Multicast alcançava vários clientes com um endereço de grupo; aqui o
+streaming é o servidor conversando com um cliente por vez, numa conexão só. Se você quisesse que
+vários clientes gRPC recebessem os mesmos avisos ao mesmo tempo, o que mudaria no servidor?**
+
+Do jeito que está, cada cliente que chama `AcompanharAvisos` recebe seu **próprio** streaming
+independente: o servidor entra no laço e gera os 5 avisos só pra aquele `StreamObserver` (Java) /
+aquele gerador (Python). Se dois clientes se inscrevem, cada um tem sua sequência separada.
+
+Pra virar um "aviso pra todos ao mesmo tempo", eu teria que fazer no servidor o mesmo que fiz no
+**mural WebSocket** do lab anterior: manter uma **lista dos clientes inscritos** (guardar cada
+`StreamObserver`/contexto quando o cliente chama `AcompanharAvisos`) e, quando um aviso for gerado,
+**percorrer essa lista mandando o mesmo aviso pra cada um** (um `onNext` por observador). Ou seja,
+a produção do aviso deixaria de ser local a cada chamada e passaria a ser central, com um
+*fan-out* pra todos os observadores registrados — além de tratar quem desconecta (tirar da lista).
+O gRPC sozinho não faz esse "um-pra-muitos" como o multicast fazia pela rede; eu que teria que
+implementar o broadcast na aplicação.
+
+**2. Compare o streaming em Java (`StreamObserver` chamando `onNext()`) com o de Python (função
+geradora com `yield`). Qual achou mais natural? Justifique.**
+
+Achei o **Python mais natural de ler**. No Python eu só escrevo um `for` com `yield` a cada aviso,
+como se a função "devolvesse vários valores" — o gRPC transforma cada `yield` num envio, e o "mandar
+pela rede" fica implícito. No Java é mais explícito e verboso: eu chamo `observador.onNext(aviso)`
+pra cada aviso, `observador.onCompleted()` no fim e trato erro com `observador.onError(...)`.
+
+Dito isso, a explicitação do Java tem um lado bom: fica claro **exatamente** quando cada mensagem é
+empurrada e quando o stream termina — no Python isso está escondido no mecanismo do gerador. Então:
+`yield` é mais gostoso de escrever, mas o `StreamObserver` deixa o ciclo de vida do stream (enviar /
+terminar / dar erro) mais visível.
+
+**3. O que acontece se o cliente fechar a conexão no meio dos 5 avisos? Teste ou pesquise e
+descreva.**
+
+Testei: subi o servidor e o cliente em Python e **matei o cliente** depois de ele receber 2 avisos.
+O que observei: o **servidor não quebrou** nem imprimiu erro — ele simplesmente parou de ter pra
+quem enviar. O gRPC percebe que o cliente sumiu e **cancela** aquela chamada de streaming (o stream
+fica inativo/cancelado). Ou seja, o trabalho daquele streaming é interrompido, mas o servidor
+continua no ar atendendo outros. Na prática, se eu quisesse economizar, dá pra o servidor detectar
+esse cancelamento (por exemplo checando se o contexto/cliente ainda está ativo antes de gerar o
+próximo aviso) e parar o laço mais cedo, em vez de continuar tentando enviar pra alguém que já foi.

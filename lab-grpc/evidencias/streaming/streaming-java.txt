@@ -1,0 +1,21 @@
+Evidencia de execucao — RPC streaming AcompanharAvisos (Java)
+Lab de gRPC — Central de Atendimento da Turma (Roteiro 3)
+Saida capturada em execucao real (container Linux).
+Uma unica inscricao -> o servidor envia 5 avisos, um a cada 2 segundos,
+na mesma conexao (streaming de servidor). A execucao inclui tambem a
+chamada unaria ConsultarHorario que vem antes.
+Para a ENTREGA, tire o print (.png) com os 2 terminais e o Get-Date visivel.
+
+============ TERMINAL 1 — SERVIDOR ============
+[gRPC] Servidor da Central ouvindo na porta 50090
+[gRPC] ConsultarHorario chamado por: Mateus
+[gRPC] AcompanharAvisos: Mateus se inscreveu.
+
+============ TERMINAL 2 — CLIENTE ============
+Digite seu nome: [gRPC] Olá, Mateus! Agora são 00:20:01.
+[gRPC] Inscrevendo-se para acompanhar avisos...
+[gRPC] Recebido: Aviso #1: a aula começa em 4 minuto(s)!
+[gRPC] Recebido: Aviso #2: a aula começa em 3 minuto(s)!
+[gRPC] Recebido: Aviso #3: a aula começa em 2 minuto(s)!
+[gRPC] Recebido: Aviso #4: a aula começa em 1 minuto(s)!
+[gRPC] Recebido: Aviso #5: a aula começa em 0 minuto(s)!
