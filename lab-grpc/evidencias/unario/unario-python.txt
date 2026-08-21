@@ -1,0 +1,17 @@
+Evidencia de execucao — RPC unario ConsultarHorario (Python)
+Lab de gRPC — Central de Atendimento da Turma (Roteiro 3)
+Saida capturada em execucao real (container Linux).
+Para a ENTREGA, tire o print (.png) na sua maquina com os 2 terminais e o Get-Date.
+
+============ TERMINAL 1 — SERVIDOR ============
+[gRPC] Servidor da Central ouvindo na porta 50100
+[gRPC] ConsultarHorario chamado por: Mateus
+
+============ TERMINAL 2 — CLIENTE ============
+Digite seu nome: [gRPC] Olá, Mateus! Agora são 00:18:15.
+
+----- Pergunta 3: chamada com o SERVIDOR DESLIGADO -----
+O gRPC lanca o status UNAVAILABLE (conexao recusada):
+	status = StatusCode.UNAVAILABLE
+	details = "failed to connect to all addresses; last error: UNKNOWN: ipv4:127.0.0.1:50100: Failed to connect to remote host: Connection refused"
+	debug_error_string = "UNAVAILABLE:failed to connect to all addresses; last error: UNKNOWN: ipv4:127.0.0.1:50100: Failed to connect to remote host: Connection refused"

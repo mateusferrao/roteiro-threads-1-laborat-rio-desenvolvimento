@@ -1,0 +1,17 @@
+Evidencia de execucao — RPC unario ConsultarHorario (Java)
+Lab de gRPC — Central de Atendimento da Turma (Roteiro 3)
+Saida capturada em execucao real (container Linux).
+Para a ENTREGA, tire o print (.png) na sua maquina com os 2 terminais e o Get-Date.
+
+============ TERMINAL 1 — SERVIDOR ============
+[gRPC] Servidor da Central ouvindo na porta 50090
+[gRPC] ConsultarHorario chamado por: Mateus
+
+============ TERMINAL 2 — CLIENTE ============
+Digite seu nome: [gRPC] Olá, Mateus! Agora são 00:18:04.
+
+----- Pergunta 3: chamada com o SERVIDOR DESLIGADO -----
+O gRPC lanca o status UNAVAILABLE (conexao recusada):
+Digite seu nome: Exception in thread "main" io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
+	at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:268)
+Caused by: io.grpc.netty.shaded.io.netty.channel.AbstractChannel$AnnotatedConnectException: finishConnect(..) failed: Connection refused: localhost/127.0.0.1:50090
