@@ -30,6 +30,16 @@ public class ClienteCentral {
             PerguntaHorario pergunta = PerguntaHorario.newBuilder().setNomeAluno(nome).build();
             RespostaHorario resposta = stub.consultarHorario(pergunta);
             System.out.println("[gRPC] " + resposta.getMensagem());
+
+            // Chamada com streaming: uma inscrição, vários Avisos ao longo do tempo.
+            // O stub devolve um Iterator; cada next() é um aviso que o servidor mandou.
+            System.out.println("[gRPC] Inscrevendo-se para acompanhar avisos...");
+            InscricaoAvisos inscricao = InscricaoAvisos.newBuilder().setNomeAluno(nome).build();
+            java.util.Iterator<Aviso> avisos = stub.acompanharAvisos(inscricao);
+            while (avisos.hasNext()) {
+                Aviso aviso = avisos.next();
+                System.out.println("[gRPC] Recebido: " + aviso.getTexto());
+            }
         } finally {
             canal.shutdown();
         }

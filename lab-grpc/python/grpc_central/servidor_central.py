@@ -24,6 +24,17 @@ class CentralAtendimentoServicer(central_pb2_grpc.CentralAtendimentoServicer):
             mensagem=f"Olá, {request.nome_aluno}! Agora são {horario}.",
         )
 
+    # RPC com streaming de servidor. Em Python é só uma função geradora: cada
+    # 'yield' envia mais um Aviso ao cliente, na mesma conexão.
+    def AcompanharAvisos(self, request, context):
+        print(f"[gRPC] AcompanharAvisos: {request.nome_aluno} se inscreveu.")
+        for i in range(1, 6):
+            yield central_pb2.Aviso(
+                numero=i,
+                texto=f"Aviso #{i}: a aula começa em {5 - i} minuto(s)!",
+            )
+            time.sleep(2)
+
 
 def main():
     servidor = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

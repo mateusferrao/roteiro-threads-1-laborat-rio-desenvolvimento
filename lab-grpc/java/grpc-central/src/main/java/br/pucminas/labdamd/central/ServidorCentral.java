@@ -41,5 +41,25 @@ public class ServidorCentral {
             observador.onNext(resposta);
             observador.onCompleted();
         }
+
+        // RPC com streaming de servidor: uma inscrição, VÁRIOS avisos ao longo do
+        // tempo. Chamo onNext() várias vezes na mesma conexão e só no fim onCompleted().
+        @Override
+        public void acompanharAvisos(InscricaoAvisos pedido, StreamObserver<Aviso> observador) {
+            System.out.println("[gRPC] AcompanharAvisos: " + pedido.getNomeAluno() + " se inscreveu.");
+            try {
+                for (int i = 1; i <= 5; i++) {
+                    Aviso aviso = Aviso.newBuilder()
+                            .setNumero(i)
+                            .setTexto("Aviso #" + i + ": a aula começa em " + (5 - i) + " minuto(s)!")
+                            .build();
+                    observador.onNext(aviso);
+                    Thread.sleep(2000);
+                }
+                observador.onCompleted();
+            } catch (InterruptedException e) {
+                observador.onError(e);
+            }
+        }
     }
 }
