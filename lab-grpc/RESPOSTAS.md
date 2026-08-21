@@ -131,7 +131,44 @@ Dá pra achar as duas operações mesmo sem entender o resto do código gerado:
 
 ## Parte C — RPC unário
 
-_(a preencher)_
+> Rodei em Java e Python; a resposta com o horário chegou nos dois (`evidencias/unario/`).
+
+**1. A linha `stub.consultarHorario(pergunta)` parece uma chamada de método comum. Cite pelo menos
+três coisas que acontecem "por baixo dos panos" entre essa chamada e o `return` no servidor.**
+
+Parece uma função local, mas no meio do caminho acontece bastante coisa. Pelo menos:
+
+1. **Serialização:** o objeto `PerguntaHorario` é transformado em bytes no formato Protocol Buffers
+   (marshalling).
+2. **Transporte pela rede:** o gRPC abre/usa uma conexão **HTTP/2** com o servidor (no meu caso
+   `localhost:50090`) e envia esses bytes por ela.
+3. **Do outro lado:** o servidor **desserializa** os bytes de volta pra um `PerguntaHorario`,
+   descobre qual método chamar (roteamento pelo nome do serviço/método) e invoca o meu
+   `consultarHorario(...)`.
+4. E na volta é o caminho inverso: a `RespostaHorario` é serializada, volta pela mesma conexão e é
+   desserializada no cliente, virando o objeto que eu recebo. Tudo isso escondido atrás de uma
+   linha só.
+
+**2. Onde estava, no `ClienteTCP` do lab anterior, o equivalente a "montar a mensagem" e
+"interpretar a resposta"? Quem faz isso agora no gRPC?**
+
+No TCP eu fazia isso **na mão**: "montar a mensagem" era o `saida.println(linha)` mandando a string
+que eu digitei, e "interpretar a resposta" era o `entrada.readLine()` lendo a linha de texto e eu
+tendo que entender aquele formato (`"Monitor responde: ..."`). Ou seja, o protocolo de aplicação era
+por minha conta. No gRPC, quem faz isso é o **código gerado a partir do `.proto`** (os stubs): eu só
+crio o objeto `PerguntaHorario` e leio os campos da `RespostaHorario` (`resposta.getMensagem()`); a
+montagem/serialização e a interpretação/desserialização são geradas e ficam invisíveis pra mim.
+
+**3. O que acontece se você chamar com o servidor desligado? Teste e descreva.**
+
+Testei nas duas linguagens (está em `evidencias/unario/`): o gRPC lança o status **`UNAVAILABLE`**.
+No Java vem como `io.grpc.StatusRuntimeException: UNAVAILABLE`, causada por um
+`Connection refused` na porta 50090; no Python vem como `StatusCode.UNAVAILABLE` com
+"failed to connect ... Connection refused". Ou seja, o erro **não fica escondido**: em vez de um
+erro de socket cru como no TCP, o gRPC me entrega um **código de status padronizado** dizendo que o
+serviço está indisponível — mas eu ainda preciso tratá-lo. É exatamente o ponto da Pergunta 2 da
+Parte A: a falha continua sendo minha responsabilidade, o framework só a apresenta de forma mais
+organizada.
 
 ---
 
