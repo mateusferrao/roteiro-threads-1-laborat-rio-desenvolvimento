@@ -1,0 +1,16 @@
+# Java
+*.class
+target/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# Obs.: os stubs gerados (central_pb2.py / central_pb2_grpc.py) SÃO versionados
+# de propósito, para quem não conseguir rodar o protoc conseguir usar o projeto.
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
