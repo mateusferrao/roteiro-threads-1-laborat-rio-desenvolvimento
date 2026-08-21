@@ -9,6 +9,9 @@ As respostas das perguntas de cada parte e os exercícios estão no [`RELATORIO.
 
 > **Roteiro 2 (Lab de Redes)** está na pasta [`lab-redes/`](lab-redes/) — TCP, UDP, Multicast e
 > WebSocket em Java e Python, com seu próprio README e RESPOSTAS.
+>
+> **Roteiro 3 (Transparências e gRPC)** está na pasta [`lab-grpc/`](lab-grpc/) — contrato `.proto`
+> e RPC unário + streaming em Java e Python, também com README e RESPOSTAS próprios.
 
 ## O que precisa pra rodar
 
