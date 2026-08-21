@@ -37,8 +37,20 @@ As bases já são diferentes de propósito, então dá pra rodar os dois servido
 
 - **Java JDK 17+** e **Maven 3.8+** (o Maven baixa o `protoc` e o plugin do gRPC sozinho na
   primeira compilação — pode demorar).
-- **Python 3.10+** e as libs: `pip install grpcio grpcio-tools`.
+- **Python 3.10+** e as libs (versões **fixadas** em `python/grpc_central/requirements.txt` —
+  veja o porquê no aviso logo abaixo): `pip install -r python/grpc_central/requirements.txt`.
 - **Git**.
+
+> **Por que instalar com `-r requirements.txt` e não `pip install grpcio grpcio-tools` solto?**
+> O protobuf moderno exige que a versão de quem **gerou** os arquivos `central_pb2.py` (o
+> "gencode") bata com a versão maior do protobuf instalado em quem **roda** (o "runtime"). Se
+> cada máquina instalar "o que for mais novo hoje", essas versões podem divergir com o tempo, e
+> o programa nem chega a iniciar — dá um erro do tipo
+> `mismatched Protobuf Gencode/Runtime major versions`. Os stubs deste repositório foram gerados
+> com as versões fixadas no `requirements.txt`; instalando exatamente elas, ninguém tem esse
+> problema. Se mesmo assim der esse erro (por exemplo, se você já tinha uma versão diferente
+> instalada globalmente antes), regenere os stubs na sua própria máquina com o comando da seção
+> abaixo — os stubs passam a bater com o que você tem instalado.
 
 ## Gerar os stubs a partir do `.proto`
 
@@ -51,10 +63,11 @@ mvn compile
 **Python** (gera `central_pb2.py` e `central_pb2_grpc.py` na pasta):
 ```powershell
 cd python/grpc_central
-pip install grpcio grpcio-tools
+pip install -r requirements.txt
 python -m grpc_tools.protoc -I ../../proto --python_out=. --grpc_python_out=. ../../proto/central.proto
 ```
-Rode o comando do Python de novo sempre que mudar o `.proto`.
+Rode o comando do Python de novo sempre que mudar o `.proto` — ou se aparecer o erro de versão
+descrito acima.
 
 ## Como rodar (sempre 2 terminais: servidor e cliente)
 

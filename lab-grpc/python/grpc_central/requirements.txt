@@ -1,0 +1,13 @@
+# Parte C/D - gRPC em Python
+# Instale com:  pip install -r requirements.txt
+#
+# Versões FIXADAS de propósito (em vez de "pip install grpcio grpcio-tools"
+# solto): o protobuf moderno exige que a versão de quem GEROU os arquivos
+# central_pb2.py/central_pb2_grpc.py (o "gencode") bata com a versão maior
+# do protobuf instalado em quem RODA (o "runtime"). Se cada aluno/professor
+# instalar "o mais recente de hoje", essas versões podem divergir entre
+# máquinas e o servidor/cliente nem chega a iniciar (erro
+# "mismatched Protobuf Gencode/Runtime major versions"). Fixando aqui, todo
+# mundo usa a mesma versão que gerou os stubs deste repositório.
+grpcio==1.68.1
+grpcio-tools==1.68.1

@@ -52,3 +52,20 @@ um a cada 2 segundos**. Espere aparecerem pelo menos 2 ou 3 avisos e tire o prin
 
 É a mesma causa do problema da Parte D do roteiro de redes. Documente a tentativa no
 `RESPOSTAS.md` e fale com o professor sobre um espelho local ou testar em outra rede.
+
+## Outros problemas comuns no Windows (já enfrentados e resolvidos)
+
+**`protoc did not exit cleanly` no `mvn compile`:** se o caminho do projeto tiver **acento**
+(ex.: "Área de Trabalho") ou estiver dentro do **OneDrive**, o `protoc.exe` pode falhar
+silenciosamente por causa de encoding do caminho no Windows. Solução: mova/clone o projeto para
+um caminho **sem acento e sem espaço** e fora do OneDrive, por exemplo `C:\dev\...`:
+```powershell
+git clone https://github.com/mateusferrao/roteiro-threads-1-laborat-rio-desenvolvimento.git C:\dev\roteiro-threads-1
+```
+
+**`mismatched Protobuf Gencode/Runtime major versions` ao rodar o Python:** os stubs
+(`central_pb2.py`) foram gerados com uma versão do protobuf, e a versão instalada na sua máquina
+é diferente. Instale exatamente as versões fixadas no `requirements.txt`
+(`pip install -r requirements.txt`) — se ainda assim der esse erro, regenere os stubs na sua
+própria máquina (comando na seção "Gerar os stubs" do README), o que garante que o gerado bate
+com o que está instalado.
